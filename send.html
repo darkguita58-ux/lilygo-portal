@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#ffffff">
-<title>LILYGO · Fotoğraf gönder</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#ffffff">
+<title>LILYGO</title>
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
 <style>
 :root{color-scheme:light;--paper:#fff;--ink:#17212b;--soft:#edf2f6;--muted:#566777;--blue:#245ce5;--blue-soft:#eef3ff;--line:#dce3ea;--error:#a62b37;--ok:#1d7a4a;--bezel:#1d232a}
@@ -47,42 +47,42 @@ p{font-size:15px;line-height:1.6;color:var(--muted);margin:0}
 .hidden{display:none!important}
 @media(min-width:600px){.shell{margin:40px auto;border-radius:24px;padding:34px 38px 40px;box-shadow:0 12px 55px #26364712;min-height:auto}}
 </style></head><body><main class="shell">
-<header class="brand"><div class="wordmark">LILYGO</div><div class="chip" id="chip">Bağlanıyor…</div></header>
+<header class="brand"><div class="wordmark">LILYGO</div><div class="chip" id="chip"></div></header>
 
 <section id="send-view">
   <div class="visual"><svg width="38" height="38" viewBox="0 0 38 38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="6" y="4" width="26" height="30" rx="3"/><circle cx="19" cy="15" r="5"/><path d="M10 30c1.5-5 5-7.5 9-7.5s7.5 2.5 9 7.5"/></svg></div>
-  <h1>Bir fotoğraf<br>gönder.</h1>
-  <p>Bu link bir LILYGO çerçevesine bağlı. Gönderdiğin fotoğraf, çerçevede önceki fotoğrafın yerini alır.</p>
+  <h1 data-t="ws_h1"></h1>
+  <p data-t="ws_lead"></p>
 
-  <div class="step"><div class="step-head"><span class="num">1</span>Çerçeve sahibinin verdiği kod</div>
-    <input class="code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="9" placeholder="•••• ••••" aria-label="8 haneli kod">
-    <div class="hint" id="code-hint">8 haneli kod. Yanlış girilirse 10 saniye beklemen gerekir.</div></div>
+  <div class="step"><div class="step-head"><span class="num">1</span><span data-t="ws_step1"></span></div>
+    <input class="code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="9" placeholder="•••• ••••" >
+    <div class="hint" id="code-hint" data-t="ws_code_hint"></div></div>
 
-  <div class="step"><div class="step-head"><span class="num">2</span>Fotoğraf</div>
-    <label class="pick" id="pick"><span class="pick-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 5v16M5 13h16"/></svg></span><strong>Fotoğraf seç</strong><small>JPEG, PNG veya HEIC</small><input type="file" id="file" accept="image/*"></label>
+  <div class="step"><div class="step-head"><span class="num">2</span><span data-t="ws_step2"></span></div>
+    <label class="pick" id="pick"><span class="pick-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 5v16M5 13h16"/></svg></span><strong data-t="c_pick_one"></strong><small data-t="c_formats"></small><input type="file" id="file" accept="image/*"></label>
     <div id="editor" class="hidden"><div class="frame" id="frame"></div>
-      <div class="controls"><div class="seg" data-k="orient"><button data-v="land">Yatay</button><button data-v="port">Dikey</button></div>
-      <div class="seg" data-k="fit"><button data-v="cover">Doldur</button><button data-v="contain">Sığdır</button></div>
-      <button class="change" id="change">Değiştir</button></div>
-      <div class="hint">Önizleme, fotoğrafın e-paper ekranda nasıl görüneceğini gösterir.</div></div></div>
+      <div class="controls"><div class="seg" data-k="orient"><button data-v="land" data-t="c_land"></button><button data-v="port" data-t="c_port"></button></div>
+      <div class="seg" data-k="fit"><button data-v="cover" data-t="c_cover"></button><button data-v="contain" data-t="c_contain"></button></div>
+      <button class="change" id="change" data-t="ws_change"></button></div>
+      <div class="hint" data-t="c_preview_hint"></div></div></div>
 
-  <button class="primary" id="send" disabled>Gönder</button>
+  <button class="primary" id="send" disabled></button>
   <div class="progress hidden" id="progress"><span></span></div>
   <div class="msg hidden" id="msg" role="status"></div>
 </section>
 
 <section id="done-view" class="done hidden">
   <div class="visual"><svg width="38" height="38" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="20" cy="20" r="16"/><path d="m12 20 5 5 11-12"/></svg></div>
-  <h1>Gönderildi.</h1><p>Fotoğraf çerçeveye ulaştı ve kaydedildi. Çerçeve sahibi “Online resmi göster” ile ekrana getirebilir.</p>
-  <button class="primary secondary" id="again">Başka bir fotoğraf gönder</button>
+  <h1 data-t="ws_done"></h1><p data-t="ws_done_copy"></p>
+  <button class="primary secondary" id="again" data-t="ws_again"></button>
 </section>
 
 <section id="bad-view" class="hidden">
-  <h1 id="bad-title">Link eksik.</h1><p id="bad-copy">Bu sayfa bir çerçeve linkiyle açılmalı. Linki sana gönderen kişiden tekrar iste.</p>
+  <h1 id="bad-title" data-t="ws_bad_title"></h1><p id="bad-copy" data-t="ws_bad_copy"></p>
 </section>
 
 <div class="secure"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>
-<span>Uçtan uca şifreli. Fotoğraf telefonunda hazırlanır ve koddan türetilen anahtarla şifrelenir; yalnızca çerçeve açabilir. Aradaki sunucu içeriği göremez ve saklamaz.</span></div>
+<span data-t="ws_secure"></span></div>
 </main>
 <script type="module">
 import {gcm} from 'https://cdn.jsdelivr.net/npm/@noble/ciphers@1.2.1/aes/+esm';
@@ -91,6 +91,14 @@ import {sha256} from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.7.1/sha256/+e
 
 const BROKER='wss://broker.hivemq.com:8884/mqtt',PARTS=16,ROUNDS=100000;
 const $=id=>document.getElementById(id),enc=new TextEncoder();
+// All languages are embedded; the sender's browser language wins, then the frame's, then English.
+const ALL={"tr":{"c_land":"Yatay","c_port":"Dikey","c_cover":"Doldur","c_contain":"Sığdır","c_formats":"JPEG, PNG veya HEIC","c_pick_one":"Fotoğraf seç","c_open_fail":"Bu dosya açılamadı","c_preview_hint":"Önizleme, fotoğrafın e-paper ekranda nasıl görüneceğini gösterir.","ws_doc":"LILYGO · Fotoğraf gönder","ws_connecting":"Bağlanıyor…","ws_online":"Çerçeve çevrimiçi","ws_offline":"Çerçeve çevrimdışı","ws_closed":"Portal kapalı","ws_searching":"Çerçeve aranıyor…","ws_h1":"Bir fotoğraf<br>gönder.","ws_lead":"Bu link bir LILYGO çerçevesine bağlı. Gönderdiğin fotoğraf, çerçevede önceki fotoğrafın yerini alır.","ws_step1":"Çerçeve sahibinin verdiği kod","ws_code_aria":"8 haneli kod","ws_code_hint":"8 haneli kod. Yanlış girilirse 10 saniye beklemen gerekir.","ws_step2":"Fotoğraf","ws_change":"Değiştir","ws_send":"Gönder","ws_retry_in":"{0} sn sonra tekrar dene","ws_sending":"Gönderiliyor…","ws_verifying":"Kod doğrulanıyor…","ws_preparing":"Fotoğraf hazırlanıyor…","ws_no_reply":"Çerçeve yanıt vermedi. Çevrimiçi olduğundan emin olup tekrar dene.","ws_wrong":"Kod yanlış. {0} saniye sonra tekrar deneyebilirsin.","ws_too_many":"Çok fazla deneme oldu. {0} saniye bekle.","ws_code_fail":"Kod doğrulanamadı. Tekrar dene.","ws_save_fail":"Çerçeve fotoğrafı kaydedemedi.","ws_done":"Gönderildi.","ws_done_copy":"Fotoğraf çerçeveye ulaştı ve kaydedildi.","ws_again":"Başka bir fotoğraf gönder","ws_bad_title":"Link eksik.","ws_bad_copy":"Bu sayfa bir çerçeve linkiyle açılmalı. Linki sana gönderen kişiden tekrar iste.","ws_closed_title":"Portal kapalı.","ws_closed_copy":"Çerçeve sahibi bu linki kapatmış. Yeni bir link ve kod iste.","ws_secure":"Uçtan uca şifreli. Fotoğraf telefonunda hazırlanır ve koddan türetilen anahtarla şifrelenir; yalnızca çerçeve açabilir. Aradaki sunucu içeriği göremez ve saklamaz."},"en":{"c_land":"Landscape","c_port":"Portrait","c_cover":"Fill","c_contain":"Fit","c_formats":"JPEG, PNG or HEIC","c_pick_one":"Choose a photo","c_open_fail":"This file could not be opened","c_preview_hint":"The preview shows how the photo will look on the e-paper screen.","ws_doc":"LILYGO · Send a photo","ws_connecting":"Connecting…","ws_online":"Frame online","ws_offline":"Frame offline","ws_closed":"Portal closed","ws_searching":"Looking for the frame…","ws_h1":"Send<br>a photo.","ws_lead":"This link belongs to a LILYGO frame. The photo you send replaces the previous one on the frame.","ws_step1":"The code from the frame's owner","ws_code_aria":"8-digit code","ws_code_hint":"8 digits. A wrong code means a 10-second wait.","ws_step2":"Photo","ws_change":"Change","ws_send":"Send","ws_retry_in":"Try again in {0} s","ws_sending":"Sending…","ws_verifying":"Checking the code…","ws_preparing":"Preparing the photo…","ws_no_reply":"The frame did not answer. Make sure it is online and try again.","ws_wrong":"Wrong code. You can try again in {0} seconds.","ws_too_many":"Too many attempts. Wait {0} seconds.","ws_code_fail":"The code could not be verified. Try again.","ws_save_fail":"The frame could not save the photo.","ws_done":"Sent.","ws_done_copy":"The photo reached the frame and was saved.","ws_again":"Send another photo","ws_bad_title":"Incomplete link.","ws_bad_copy":"Open this page with a frame link. Ask the person who sent it for the link again.","ws_closed_title":"Portal closed.","ws_closed_copy":"The frame's owner closed this link. Ask for a new link and code.","ws_secure":"End-to-end encrypted. The photo is prepared on your phone and encrypted with a key derived from the code; only the frame can open it. The relay server can't see or store it."},"de":{"c_land":"Quer","c_port":"Hoch","c_cover":"Füllen","c_contain":"Einpassen","c_formats":"JPEG, PNG oder HEIC","c_pick_one":"Foto wählen","c_open_fail":"Datei konnte nicht geöffnet werden","c_preview_hint":"Die Vorschau zeigt, wie das Foto auf dem E-Paper aussieht.","ws_doc":"LILYGO · Foto senden","ws_connecting":"Verbinde…","ws_online":"Rahmen online","ws_offline":"Rahmen offline","ws_closed":"Portal geschlossen","ws_searching":"Suche den Rahmen…","ws_h1":"Ein Foto<br>senden.","ws_lead":"Dieser Link gehört zu einem LILYGO-Rahmen. Dein Foto ersetzt das vorherige.","ws_step1":"Code vom Besitzer des Rahmens","ws_code_aria":"8-stelliger Code","ws_code_hint":"8 Ziffern. Ein falscher Code bedeutet 10 Sekunden Wartezeit.","ws_step2":"Foto","ws_change":"Ändern","ws_send":"Senden","ws_retry_in":"In {0} s erneut versuchen","ws_sending":"Wird gesendet…","ws_verifying":"Code wird geprüft…","ws_preparing":"Foto wird vorbereitet…","ws_no_reply":"Der Rahmen antwortet nicht. Ist er online? Erneut versuchen.","ws_wrong":"Falscher Code. In {0} Sekunden erneut versuchen.","ws_too_many":"Zu viele Versuche. {0} Sekunden warten.","ws_code_fail":"Code konnte nicht geprüft werden. Erneut versuchen.","ws_save_fail":"Der Rahmen konnte das Foto nicht speichern.","ws_done":"Gesendet.","ws_done_copy":"Das Foto ist beim Rahmen angekommen und gespeichert.","ws_again":"Weiteres Foto senden","ws_bad_title":"Unvollständiger Link.","ws_bad_copy":"Diese Seite braucht einen Rahmen-Link. Frag die Person erneut danach.","ws_closed_title":"Portal geschlossen.","ws_closed_copy":"Der Besitzer hat den Link geschlossen. Um neuen Link und Code bitten.","ws_secure":"Ende-zu-Ende-verschlüsselt. Das Foto wird auf dem Handy vorbereitet und mit einem Schlüssel aus dem Code verschlüsselt; nur der Rahmen kann es öffnen. Der Server sieht und speichert nichts."},"fr":{"c_land":"Paysage","c_port":"Portrait","c_cover":"Remplir","c_contain":"Ajuster","c_formats":"JPEG, PNG ou HEIC","c_pick_one":"Choisir une photo","c_open_fail":"Impossible d'ouvrir ce fichier","c_preview_hint":"L'aperçu montre le rendu sur l'écran e-paper.","ws_doc":"LILYGO · Envoyer une photo","ws_connecting":"Connexion…","ws_online":"Cadre en ligne","ws_offline":"Cadre hors ligne","ws_closed":"Portail fermé","ws_searching":"Recherche du cadre…","ws_h1":"Envoyer<br>une photo.","ws_lead":"Ce lien est associé à un cadre LILYGO. Votre photo remplace la précédente.","ws_step1":"Code donné par le propriétaire du cadre","ws_code_aria":"Code à 8 chiffres","ws_code_hint":"8 chiffres. Un code erroné impose 10 secondes d'attente.","ws_step2":"Photo","ws_change":"Changer","ws_send":"Envoyer","ws_retry_in":"Réessayez dans {0} s","ws_sending":"Envoi…","ws_verifying":"Vérification du code…","ws_preparing":"Préparation de la photo…","ws_no_reply":"Le cadre n'a pas répondu. Vérifiez qu'il est en ligne et réessayez.","ws_wrong":"Code erroné. Réessayez dans {0} secondes.","ws_too_many":"Trop de tentatives. Attendez {0} secondes.","ws_code_fail":"Code non vérifié. Réessayez.","ws_save_fail":"Le cadre n'a pas pu enregistrer la photo.","ws_done":"Envoyée.","ws_done_copy":"La photo est arrivée sur le cadre et a été enregistrée.","ws_again":"Envoyer une autre photo","ws_bad_title":"Lien incomplet.","ws_bad_copy":"Ouvrez cette page avec un lien de cadre. Redemandez-le à la personne.","ws_closed_title":"Portail fermé.","ws_closed_copy":"Le propriétaire a fermé ce lien. Demandez un nouveau lien et un code.","ws_secure":"Chiffré de bout en bout. La photo est préparée sur le téléphone et chiffrée avec une clé issue du code ; seul le cadre peut l'ouvrir. Le serveur relais ne voit et ne garde rien."},"es":{"c_land":"Horizontal","c_port":"Vertical","c_cover":"Rellenar","c_contain":"Ajustar","c_formats":"JPEG, PNG o HEIC","c_pick_one":"Elegir una foto","c_open_fail":"No se pudo abrir el archivo","c_preview_hint":"La vista previa muestra cómo se verá en la pantalla e-paper.","ws_doc":"LILYGO · Enviar una foto","ws_connecting":"Conectando…","ws_online":"Marco en línea","ws_offline":"Marco sin conexión","ws_closed":"Portal cerrado","ws_searching":"Buscando el marco…","ws_h1":"Envía<br>una foto.","ws_lead":"Este enlace pertenece a un marco LILYGO. Tu foto reemplaza a la anterior.","ws_step1":"Código del dueño del marco","ws_code_aria":"Código de 8 cifras","ws_code_hint":"8 cifras. Un código incorrecto implica esperar 10 segundos.","ws_step2":"Foto","ws_change":"Cambiar","ws_send":"Enviar","ws_retry_in":"Reintenta en {0} s","ws_sending":"Enviando…","ws_verifying":"Comprobando el código…","ws_preparing":"Preparando la foto…","ws_no_reply":"El marco no respondió. Comprueba que esté en línea e inténtalo de nuevo.","ws_wrong":"Código incorrecto. Reintenta en {0} segundos.","ws_too_many":"Demasiados intentos. Espera {0} segundos.","ws_code_fail":"No se pudo verificar el código. Inténtalo de nuevo.","ws_save_fail":"El marco no pudo guardar la foto.","ws_done":"Enviada.","ws_done_copy":"La foto llegó al marco y se guardó.","ws_again":"Enviar otra foto","ws_bad_title":"Enlace incompleto.","ws_bad_copy":"Abre esta página con el enlace de un marco. Pídeselo de nuevo a quien te lo envió.","ws_closed_title":"Portal cerrado.","ws_closed_copy":"El dueño cerró este enlace. Pide un enlace y un código nuevos.","ws_secure":"Cifrado de extremo a extremo. La foto se prepara en tu móvil y se cifra con una clave derivada del código; solo el marco puede abrirla. El servidor intermedio no la ve ni la guarda."},"pt":{"c_land":"Paisagem","c_port":"Retrato","c_cover":"Preencher","c_contain":"Ajustar","c_formats":"JPEG, PNG ou HEIC","c_pick_one":"Escolher uma foto","c_open_fail":"Não foi possível abrir o arquivo","c_preview_hint":"A prévia mostra como a foto ficará na tela e-paper.","ws_doc":"LILYGO · Enviar uma foto","ws_connecting":"Conectando…","ws_online":"Moldura online","ws_offline":"Moldura offline","ws_closed":"Portal fechado","ws_searching":"Procurando a moldura…","ws_h1":"Envie<br>uma foto.","ws_lead":"Este link é de uma moldura LILYGO. Sua foto substitui a anterior.","ws_step1":"Código do dono da moldura","ws_code_aria":"Código de 8 dígitos","ws_code_hint":"8 dígitos. Um código errado exige esperar 10 segundos.","ws_step2":"Foto","ws_change":"Trocar","ws_send":"Enviar","ws_retry_in":"Tente em {0} s","ws_sending":"Enviando…","ws_verifying":"Verificando o código…","ws_preparing":"Preparando a foto…","ws_no_reply":"A moldura não respondeu. Verifique se está online e tente de novo.","ws_wrong":"Código errado. Tente de novo em {0} segundos.","ws_too_many":"Tentativas demais. Aguarde {0} segundos.","ws_code_fail":"Não foi possível verificar o código. Tente de novo.","ws_save_fail":"A moldura não conseguiu salvar a foto.","ws_done":"Enviada.","ws_done_copy":"A foto chegou à moldura e foi salva.","ws_again":"Enviar outra foto","ws_bad_title":"Link incompleto.","ws_bad_copy":"Abra esta página com um link de moldura. Peça o link de novo a quem enviou.","ws_closed_title":"Portal fechado.","ws_closed_copy":"O dono fechou este link. Peça um novo link e código.","ws_secure":"Criptografia de ponta a ponta. A foto é preparada no celular e criptografada com uma chave derivada do código; só a moldura pode abri-la. O servidor intermediário não vê nem guarda nada."},"pl":{"c_land":"Poziomo","c_port":"Pionowo","c_cover":"Wypełnij","c_contain":"Dopasuj","c_formats":"JPEG, PNG lub HEIC","c_pick_one":"Wybierz zdjęcie","c_open_fail":"Nie można otworzyć pliku","c_preview_hint":"Podgląd pokazuje wygląd zdjęcia na ekranie e-papierowym.","ws_doc":"LILYGO · Wyślij zdjęcie","ws_connecting":"Łączenie…","ws_online":"Ramka online","ws_offline":"Ramka offline","ws_closed":"Portal zamknięty","ws_searching":"Szukanie ramki…","ws_h1":"Wyślij<br>zdjęcie.","ws_lead":"Ten link należy do ramki LILYGO. Twoje zdjęcie zastąpi poprzednie.","ws_step1":"Kod od właściciela ramki","ws_code_aria":"8-cyfrowy kod","ws_code_hint":"8 cyfr. Błędny kod oznacza 10 sekund czekania.","ws_step2":"Zdjęcie","ws_change":"Zmień","ws_send":"Wyślij","ws_retry_in":"Spróbuj za {0} s","ws_sending":"Wysyłanie…","ws_verifying":"Sprawdzanie kodu…","ws_preparing":"Przygotowywanie zdjęcia…","ws_no_reply":"Ramka nie odpowiedziała. Sprawdź, czy jest online, i spróbuj ponownie.","ws_wrong":"Błędny kod. Spróbuj ponownie za {0} s.","ws_too_many":"Zbyt wiele prób. Odczekaj {0} s.","ws_code_fail":"Nie udało się zweryfikować kodu. Spróbuj ponownie.","ws_save_fail":"Ramka nie zapisała zdjęcia.","ws_done":"Wysłano.","ws_done_copy":"Zdjęcie dotarło do ramki i zostało zapisane.","ws_again":"Wyślij kolejne zdjęcie","ws_bad_title":"Niepełny link.","ws_bad_copy":"Otwórz tę stronę przez link ramki. Poproś nadawcę o link ponownie.","ws_closed_title":"Portal zamknięty.","ws_closed_copy":"Właściciel zamknął ten link. Poproś o nowy link i kod.","ws_secure":"Szyfrowanie end-to-end. Zdjęcie jest przygotowywane w telefonie i szyfrowane kluczem z kodu; otworzy je tylko ramka. Serwer pośredniczący niczego nie widzi ani nie przechowuje."}};
+const browserLang=(navigator.languages||[navigator.language||'']).map(l=>String(l).slice(0,2).toLowerCase()).find(l=>ALL[l]);
+let T=ALL[browserLang||'en'];
+const t=(k,...a)=>String(T[k]||k).replace(/\{(\d)\}/g,(m,i)=>a[i]);
+function applyTexts(){document.documentElement.lang=browserLang||'en';document.title=t('ws_doc');$('code').setAttribute('aria-label',t('ws_code_aria'));
+  document.querySelectorAll('[data-t]').forEach(e=>e.innerHTML=t(e.dataset.t));}
+applyTexts();
 const pid=location.hash.slice(1).toLowerCase();
 let gamma=.4,devState=null,client,item=null,busy=false,waitUntil=0,cachedKey=null;
 const sid=sessionStorage.lilygoSid||(sessionStorage.lilygoSid=[...crypto.getRandomValues(new Uint8Array(4))].map(b=>b.toString(16).padStart(2,'0')).join(''));
@@ -101,14 +109,14 @@ function msg(text,kind){$('msg').textContent=text;$('msg').className='msg '+(kin
 function digits(){return $('code').value.replace(/\D/g,'');}
 function update(){
   const chip=$('chip');chip.className='chip';
-  if(!client||!client.connected)chip.textContent='Bağlanıyor…';
-  else if(devState==='online'){chip.textContent='Çerçeve çevrimiçi';chip.classList.add('on');}
-  else if(devState==='offline'){chip.textContent='Çerçeve çevrimdışı';chip.classList.add('off');}
-  else if(devState==='closed'){chip.textContent='Portal kapalı';chip.classList.add('closed');}
-  else chip.textContent='Çerçeve aranıyor…';
+  if(!client||!client.connected)chip.textContent=t('ws_connecting');
+  else if(devState==='online'){chip.textContent=t('ws_online');chip.classList.add('on');}
+  else if(devState==='offline'){chip.textContent=t('ws_offline');chip.classList.add('off');}
+  else if(devState==='closed'){chip.textContent=t('ws_closed');chip.classList.add('closed');}
+  else chip.textContent=t('ws_searching');
   const wait=Math.max(0,Math.ceil((waitUntil-Date.now())/1000));
   $('send').disabled=busy||!item||digits().length!==8||wait>0||devState!=='online';
-  $('send').textContent=wait?`${wait} sn sonra tekrar dene`:busy?'Gönderiliyor…':'Gönder';
+  $('send').textContent=wait?t('ws_retry_in',wait):busy?t('ws_sending'):t('ws_send');
 }
 setInterval(update,500);
 
@@ -119,8 +127,10 @@ else{
   client.on('close',update);
   client.on('message',(topic,buf)=>{
     let m;try{m=JSON.parse(buf.toString());}catch(e){return;}
-    if(topic.endsWith('/status')){devState=m.s;if(m.gamma)gamma=m.gamma;update();
-      if(m.s==='closed'){$('bad-title').textContent='Portal kapalı.';$('bad-copy').textContent='Çerçeve sahibi bu linki kapatmış. Yeni bir link ve kod iste.';show('bad');}
+    if(topic.endsWith('/status')){devState=m.s;if(m.gamma)gamma=m.gamma;
+      if(!browserLang&&m.lang&&ALL[m.lang]&&T!==ALL[m.lang]){T=ALL[m.lang];applyTexts();}
+      update();
+      if(m.s==='closed'){$('bad-title').textContent=t('ws_closed_title');$('bad-copy').textContent=t('ws_closed_copy');show('bad');}
       return;}
     if(pending&&pending.type===m.type)pending.resolve(m);else if(pending&&m.type==='missing'&&pending.type==='photo')pending.missing(m);
   });
@@ -163,7 +173,7 @@ $('change').onclick=()=>{if(!busy)$('file').click();};
 
 // ---- protocol ----
 let pending=null;
-function await_(type,ms,onMissing){return new Promise((resolve,reject)=>{const t=setTimeout(()=>{pending=null;reject(new Error('Çerçeve yanıt vermedi. Çevrimiçi olduğundan emin olup tekrar dene.'));},ms);
+function await_(type,ms,onMissing){return new Promise((resolve,reject)=>{const t=setTimeout(()=>{pending=null;reject(new Error(t('ws_no_reply')));},ms);
   pending={type,resolve:m=>{clearTimeout(t);pending=null;resolve(m);},missing:m=>{onMissing&&onMissing(m);}};});}
 async function keyFor(code){if(cachedKey&&cachedKey.code===code)return cachedKey.key;
   const key=await pbkdf2Async(sha256,code,'lilygo-portal:'+pid,{c:ROUNDS,dkLen:32});cachedKey={code,key};return key;}
@@ -171,26 +181,26 @@ function seal(key,plain){const nonce=crypto.getRandomValues(new Uint8Array(12)),
 function cat(...parts){const n=parts.reduce((a,p)=>a+p.length,0),o=new Uint8Array(n);let i=0;for(const p of parts){o.set(p,i);i+=p.length;}return o;}
 
 $('send').onclick=async()=>{
-  if(busy)return;busy=true;update();msg('Kod doğrulanıyor…');$('progress').classList.remove('hidden');bar(5);
+  if(busy)return;busy=true;update();msg(t('ws_verifying'));$('progress').classList.remove('hidden');bar(5);
   try{
     const key=await keyFor(digits());
     const authWait=await_('auth',15000);
     client.publish(base+'/auth',cat(enc.encode('LGA1'+sid),seal(key,enc.encode('auth:'+sid))));
     const a=await authWait;
     if(!a.ok){waitUntil=Date.now()+(a.wait||10)*1000;$('code').classList.toggle('bad',a.err==='code');
-      throw new Error(a.err==='code'?`Kod yanlış. ${a.wait||10} saniye sonra tekrar deneyebilirsin.`:`Çok fazla deneme oldu. ${a.wait} saniye bekle.`);}
-    msg('Fotoğraf hazırlanıyor…');bar(15);
+      throw new Error(a.err==='code'?t('ws_wrong',a.wait||10):t('ws_too_many',a.wait));}
+    msg(t('ws_preparing'));bar(15);
     const src=await decode(item.file);const r=render(src,item.orient,item.fit,1);src.close&&src.close();
     const lgi=new Uint8Array(8+r.w*r.h/2);lgi.set([76,71,73,49,r.w&255,r.w>>8,r.h&255,r.h>>8]);
     for(let i=0,j=8;i<r.levels.length;i+=2,j++)lgi[j]=r.levels[i]|(r.levels[i+1]<<4);
     const sealed=seal(key,lgi),size=Math.ceil(sealed.length/PARTS),t=crypto.getRandomValues(new Uint32Array(1))[0];
     const part=i=>{const h=new Uint8Array(20),v=new DataView(h.buffer);h.set(enc.encode('LGE1'));v.setUint32(4,t,true);v.setUint16(8,i,true);v.setUint16(10,PARTS,true);h.set(enc.encode(sid),12);
       return cat(h,sealed.subarray(i*size,(i+1)*size));};
-    msg('Gönderiliyor…');
+    msg(t('ws_sending'));
     const done=await_('photo',40000,m=>{if(m.t===t)m.missing.forEach(i=>client.publish(base+'/up',part(i)));});
     for(let i=0;i<PARTS;i++){client.publish(base+'/up',part(i));bar(20+70*(i+1)/PARTS);await new Promise(r=>setTimeout(r,15));}
     const p=await done;
-    if(!p.ok)throw new Error(p.err==='code'?'Kod doğrulanamadı. Tekrar dene.':'Çerçeve fotoğrafı kaydedemedi.');
+    if(!p.ok)throw new Error(t(p.err==='code'?'ws_code_fail':'ws_save_fail'));
     bar(100);show('done');msg('');
   }catch(e){msg(e.message,'err');}
   finally{busy=false;$('progress').classList.add('hidden');update();}
