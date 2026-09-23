@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#ffffff">
+<title>LILYGO · Fotoğraf gönder</title>
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<style>
+:root{color-scheme:light;--paper:#fff;--ink:#17212b;--soft:#edf2f6;--muted:#566777;--blue:#245ce5;--blue-soft:#eef3ff;--line:#dce3ea;--error:#a62b37;--ok:#1d7a4a;--bezel:#1d232a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--soft);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}button{cursor:pointer;color:inherit}button:disabled{cursor:default;opacity:.55}
+button:focus-visible,label:focus-within,input:focus-visible{outline:3px solid #8cadff;outline-offset:3px}
+.shell{max-width:540px;min-height:100dvh;margin:auto;background:var(--paper);padding:28px 24px 40px}
+.brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
+.wordmark{font-size:21px;font-weight:800;letter-spacing:-.8px}
+.chip{font-size:12px;color:var(--muted);display:flex;gap:7px;align-items:center}.chip:before{content:"";height:7px;width:7px;background:#b8c5d1;border-radius:50%}
+.chip.on:before{background:var(--ok);box-shadow:0 0 0 4px #1d7a4a22}.chip.off:before{background:#c9a227}.chip.closed:before{background:var(--error)}
+.visual{width:72px;height:72px;border:1px solid var(--line);border-radius:22px;display:grid;place-items:center;margin-bottom:22px;color:var(--blue)}
+svg{display:block}
+h1{font-size:34px;line-height:1.12;letter-spacing:-1.3px;font-weight:650;margin:0 0 14px}
+p{font-size:15px;line-height:1.6;color:var(--muted);margin:0}
+.step{margin-top:34px}.step-head{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:650;letter-spacing:.2px;margin-bottom:12px}
+.num{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-size:12px}
+.code{width:100%;padding:16px 18px;border:1px solid #b8c5d1;border-radius:12px;font-size:28px;font-weight:650;letter-spacing:6px;text-align:center;font-variant-numeric:tabular-nums;outline:0;background:#fff}
+.code:focus{border-color:var(--blue)}.code.bad{border-color:var(--error);background:#fff7f7}
+.hint{font-size:12.5px;color:var(--muted);margin-top:8px}
+.pick{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 20px;border:1.5px dashed #b8c5d1;border-radius:16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.pick:hover{border-color:var(--blue);background:#fafcff}
+.pick-icon{width:52px;height:52px;border-radius:16px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center}
+.pick strong{font-size:17px;font-weight:650}.pick small{font-size:13px;color:var(--muted)}
+.pick input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.frame{position:relative;background:var(--bezel);border-radius:14px;padding:10px;display:flex;justify-content:center;box-shadow:0 10px 30px #17212b1f}
+.frame canvas{display:block;background:#fff;border-radius:3px;width:100%;height:auto}
+.frame.port canvas{width:auto;height:min(56vh,420px);max-width:100%}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}
+.seg{display:inline-flex;background:var(--soft);border-radius:10px;padding:3px}
+.seg button{border:0;background:none;padding:8px 13px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px #17212b24}
+.change{margin-left:auto;border:0;background:none;color:var(--blue);font-size:13.5px;font-weight:600;padding:8px 2px}
+.primary{display:flex;justify-content:center;align-items:center;gap:10px;width:100%;min-height:54px;margin-top:30px;padding:14px 22px;background:var(--blue);color:#fff;border:0;border-radius:12px;font-size:16px;font-weight:650}
+.secondary{background:var(--blue-soft);color:var(--blue)}
+.progress{height:4px;border-radius:2px;background:var(--soft);margin-top:14px;overflow:hidden}.progress span{display:block;height:100%;width:0;background:var(--blue);transition:width .25s}
+.msg{margin-top:16px;padding:13px 15px;border-radius:10px;font-size:14px;line-height:1.5}
+.msg.err{border-left:3px solid var(--error);background:#fff4f4;color:var(--error);border-radius:0 10px 10px 0}
+.msg.info{background:var(--soft);color:var(--ink)}
+.secure{display:flex;gap:10px;align-items:flex-start;margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;line-height:1.6;color:#647585}
+.secure svg{flex:none;margin-top:2px}
+.done .visual{color:var(--ok)}
+.hidden{display:none!important}
+@media(min-width:600px){.shell{margin:40px auto;border-radius:24px;padding:34px 38px 40px;box-shadow:0 12px 55px #26364712;min-height:auto}}
+</style></head><body><main class="shell">
+<header class="brand"><div class="wordmark">LILYGO</div><div class="chip" id="chip">Bağlanıyor…</div></header>
+
+<section id="send-view">
+  <div class="visual"><svg width="38" height="38" viewBox="0 0 38 38" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="6" y="4" width="26" height="30" rx="3"/><circle cx="19" cy="15" r="5"/><path d="M10 30c1.5-5 5-7.5 9-7.5s7.5 2.5 9 7.5"/></svg></div>
+  <h1>Bir fotoğraf<br>gönder.</h1>
+  <p>Bu link bir LILYGO çerçevesine bağlı. Gönderdiğin fotoğraf, çerçevede önceki fotoğrafın yerini alır.</p>
+
+  <div class="step"><div class="step-head"><span class="num">1</span>Çerçeve sahibinin verdiği kod</div>
+    <input class="code" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="9" placeholder="•••• ••••" aria-label="8 haneli kod">
+    <div class="hint" id="code-hint">8 haneli kod. Yanlış girilirse 10 saniye beklemen gerekir.</div></div>
+
+  <div class="step"><div class="step-head"><span class="num">2</span>Fotoğraf</div>
+    <label class="pick" id="pick"><span class="pick-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M13 5v16M5 13h16"/></svg></span><strong>Fotoğraf seç</strong><small>JPEG, PNG veya HEIC</small><input type="file" id="file" accept="image/*"></label>
+    <div id="editor" class="hidden"><div class="frame" id="frame"></div>
+      <div class="controls"><div class="seg" data-k="orient"><button data-v="land">Yatay</button><button data-v="port">Dikey</button></div>
+      <div class="seg" data-k="fit"><button data-v="cover">Doldur</button><button data-v="contain">Sığdır</button></div>
+      <button class="change" id="change">Değiştir</button></div>
+      <div class="hint">Önizleme, fotoğrafın e-paper ekranda nasıl görüneceğini gösterir.</div></div></div>
+
+  <button class="primary" id="send" disabled>Gönder</button>
+  <div class="progress hidden" id="progress"><span></span></div>
+  <div class="msg hidden" id="msg" role="status"></div>
+</section>
+
+<section id="done-view" class="done hidden">
+  <div class="visual"><svg width="38" height="38" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="20" cy="20" r="16"/><path d="m12 20 5 5 11-12"/></svg></div>
+  <h1>Gönderildi.</h1><p>Fotoğraf çerçeveye ulaştı ve kaydedildi. Çerçeve sahibi “Online resmi göster” ile ekrana getirebilir.</p>
+  <button class="primary secondary" id="again">Başka bir fotoğraf gönder</button>
+</section>
+
+<section id="bad-view" class="hidden">
+  <h1 id="bad-title">Link eksik.</h1><p id="bad-copy">Bu sayfa bir çerçeve linkiyle açılmalı. Linki sana gönderen kişiden tekrar iste.</p>
+</section>
+
+<div class="secure"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>
+<span>Uçtan uca şifreli. Fotoğraf telefonunda hazırlanır ve koddan türetilen anahtarla şifrelenir; yalnızca çerçeve açabilir. Aradaki sunucu içeriği göremez ve saklamaz.</span></div>
+</main>
+<script type="module">
+import {gcm} from 'https://cdn.jsdelivr.net/npm/@noble/ciphers@1.2.1/aes/+esm';
+import {pbkdf2Async} from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.7.1/pbkdf2/+esm';
+import {sha256} from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.7.1/sha256/+esm';
+
+const BROKER='wss://broker.hivemq.com:8884/mqtt',PARTS=16,ROUNDS=100000;
+const $=id=>document.getElementById(id),enc=new TextEncoder();
+const pid=location.hash.slice(1).toLowerCase();
+let gamma=.4,devState=null,client,item=null,busy=false,waitUntil=0,cachedKey=null;
+const sid=sessionStorage.lilygoSid||(sessionStorage.lilygoSid=[...crypto.getRandomValues(new Uint8Array(4))].map(b=>b.toString(16).padStart(2,'0')).join(''));
+const base='lilygo/v2/'+pid;
+
+function show(v){for(const n of ['send','done','bad'])$(n+'-view').classList.toggle('hidden',n!==v);}
+function msg(text,kind){$('msg').textContent=text;$('msg').className='msg '+(kind||'info');$('msg').classList.toggle('hidden',!text);}
+function digits(){return $('code').value.replace(/\D/g,'');}
+function update(){
+  const chip=$('chip');chip.className='chip';
+  if(!client||!client.connected)chip.textContent='Bağlanıyor…';
+  else if(devState==='online'){chip.textContent='Çerçeve çevrimiçi';chip.classList.add('on');}
+  else if(devState==='offline'){chip.textContent='Çerçeve çevrimdışı';chip.classList.add('off');}
+  else if(devState==='closed'){chip.textContent='Portal kapalı';chip.classList.add('closed');}
+  else chip.textContent='Çerçeve aranıyor…';
+  const wait=Math.max(0,Math.ceil((waitUntil-Date.now())/1000));
+  $('send').disabled=busy||!item||digits().length!==8||wait>0||devState!=='online';
+  $('send').textContent=wait?`${wait} sn sonra tekrar dene`:busy?'Gönderiliyor…':'Gönder';
+}
+setInterval(update,500);
+
+if(!/^[a-z0-9]{16}$/.test(pid)){show('bad');}
+else{
+  client=mqtt.connect(BROKER,{clientId:'web-'+sid+'-'+Math.random().toString(16).slice(2,6),reconnectPeriod:3000});
+  client.on('connect',()=>{client.subscribe([base+'/status',base+'/res/'+sid]);update();});
+  client.on('close',update);
+  client.on('message',(topic,buf)=>{
+    let m;try{m=JSON.parse(buf.toString());}catch(e){return;}
+    if(topic.endsWith('/status')){devState=m.s;if(m.gamma)gamma=m.gamma;update();
+      if(m.s==='closed'){$('bad-title').textContent='Portal kapalı.';$('bad-copy').textContent='Çerçeve sahibi bu linki kapatmış. Yeni bir link ve kod iste.';show('bad');}
+      return;}
+    if(pending&&pending.type===m.type)pending.resolve(m);else if(pending&&m.type==='missing'&&pending.type==='photo')pending.missing(m);
+  });
+}
+$('code').addEventListener('input',()=>{const d=digits().slice(0,8);$('code').value=d.length>4?d.slice(0,4)+' '+d.slice(4):d;$('code').classList.remove('bad');update();});
+
+// ---- photo: panel shape, tone curve from the device, 16 grays with Floyd–Steinberg ----
+async function decode(file){
+  try{return await createImageBitmap(file,{imageOrientation:'from-image'});}catch(e){}
+  return await new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=URL.createObjectURL(file);});
+}
+function render(src,o,fit,scale){
+  const [W,H]=o==='land'?[960,540]:[540,960],w=Math.round(W*scale),h=Math.round(H*scale);
+  const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});
+  g.fillStyle='#fff';g.fillRect(0,0,w,h);g.imageSmoothingQuality='high';
+  const k=(fit==='cover'?Math.max:Math.min)(w/src.width,h/src.height);g.drawImage(src,(w-src.width*k)/2,(h-src.height*k)/2,src.width*k,src.height*k);
+  const img=g.getImageData(0,0,w,h),d=img.data,n=w*h,L=new Float32Array(n),hist=new Uint32Array(256);
+  for(let i=0;i<n;i++){const v=.2126*d[i*4]+.7152*d[i*4+1]+.0722*d[i*4+2];L[i]=v;hist[v|0]++;}
+  let lo=0,hi=255,acc=0;const clip=n*.005;for(;lo<255&&(acc+=hist[lo])<clip;lo++);acc=0;for(;hi>0&&(acc+=hist[hi])<clip;hi--);
+  lo=Math.min(lo,40);hi=Math.max(hi,215);const span=Math.max(1,hi-lo);
+  for(let i=0;i<n;i++){let v=(L[i]-lo)/span;v=v<0?0:v>1?1:v;L[i]=Math.pow(v,gamma)*15;}
+  const out=new Uint8Array(n);
+  for(let y=0;y<h;y++){const rev=y&1,dir=rev?-1:1;
+    for(let x=rev?w-1:0;rev?x>=0:x<w;x+=dir){const i=y*w+x,old=L[i],q=old<0?0:old>15?15:Math.round(old);out[i]=q;const e=old-q;
+      if(x+dir>=0&&x+dir<w)L[i+dir]+=e*7/16;
+      if(y+1<h){const j=i+w;if(x-dir>=0&&x-dir<w)L[j-dir]+=e*3/16;L[j]+=e*5/16;if(x+dir>=0&&x+dir<w)L[j+dir]+=e/16;}}}
+  for(let i=0;i<n;i++){d[i*4]=d[i*4+1]=d[i*4+2]=out[i]*17;d[i*4+3]=255;}g.putImageData(img,0,0);
+  return {canvas:c,levels:out,w,h};
+}
+async function preview(){
+  const src=await decode(item.file);const r=render(src,item.orient,item.fit,.4);src.close&&src.close();
+  $('frame').replaceChildren(r.canvas);$('frame').classList.toggle('port',item.orient==='port');
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',item[b.parentNode.dataset.k]===b.dataset.v));
+}
+$('file').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;
+  const src=await decode(file);item={file,orient:src.width<src.height?'port':'land',fit:'cover'};src.close&&src.close();
+  $('pick').classList.add('hidden');$('editor').classList.remove('hidden');msg('');await preview();update();};
+document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const v=e.target.dataset.v;if(!v||busy)return;item[s.dataset.k]=v;preview();});
+$('change').onclick=()=>{if(!busy)$('file').click();};
+
+// ---- protocol ----
+let pending=null;
+function await_(type,ms,onMissing){return new Promise((resolve,reject)=>{const t=setTimeout(()=>{pending=null;reject(new Error('Çerçeve yanıt vermedi. Çevrimiçi olduğundan emin olup tekrar dene.'));},ms);
+  pending={type,resolve:m=>{clearTimeout(t);pending=null;resolve(m);},missing:m=>{onMissing&&onMissing(m);}};});}
+async function keyFor(code){if(cachedKey&&cachedKey.code===code)return cachedKey.key;
+  const key=await pbkdf2Async(sha256,code,'lilygo-portal:'+pid,{c:ROUNDS,dkLen:32});cachedKey={code,key};return key;}
+function seal(key,plain){const nonce=crypto.getRandomValues(new Uint8Array(12)),ct=gcm(key,nonce).encrypt(plain),out=new Uint8Array(12+ct.length);out.set(nonce);out.set(ct,12);return out;}
+function cat(...parts){const n=parts.reduce((a,p)=>a+p.length,0),o=new Uint8Array(n);let i=0;for(const p of parts){o.set(p,i);i+=p.length;}return o;}
+
+$('send').onclick=async()=>{
+  if(busy)return;busy=true;update();msg('Kod doğrulanıyor…');$('progress').classList.remove('hidden');bar(5);
+  try{
+    const key=await keyFor(digits());
+    const authWait=await_('auth',15000);
+    client.publish(base+'/auth',cat(enc.encode('LGA1'+sid),seal(key,enc.encode('auth:'+sid))));
+    const a=await authWait;
+    if(!a.ok){waitUntil=Date.now()+(a.wait||10)*1000;$('code').classList.toggle('bad',a.err==='code');
+      throw new Error(a.err==='code'?`Kod yanlış. ${a.wait||10} saniye sonra tekrar deneyebilirsin.`:`Çok fazla deneme oldu. ${a.wait} saniye bekle.`);}
+    msg('Fotoğraf hazırlanıyor…');bar(15);
+    const src=await decode(item.file);const r=render(src,item.orient,item.fit,1);src.close&&src.close();
+    const lgi=new Uint8Array(8+r.w*r.h/2);lgi.set([76,71,73,49,r.w&255,r.w>>8,r.h&255,r.h>>8]);
+    for(let i=0,j=8;i<r.levels.length;i+=2,j++)lgi[j]=r.levels[i]|(r.levels[i+1]<<4);
+    const sealed=seal(key,lgi),size=Math.ceil(sealed.length/PARTS),t=crypto.getRandomValues(new Uint32Array(1))[0];
+    const part=i=>{const h=new Uint8Array(20),v=new DataView(h.buffer);h.set(enc.encode('LGE1'));v.setUint32(4,t,true);v.setUint16(8,i,true);v.setUint16(10,PARTS,true);h.set(enc.encode(sid),12);
+      return cat(h,sealed.subarray(i*size,(i+1)*size));};
+    msg('Gönderiliyor…');
+    const done=await_('photo',40000,m=>{if(m.t===t)m.missing.forEach(i=>client.publish(base+'/up',part(i)));});
+    for(let i=0;i<PARTS;i++){client.publish(base+'/up',part(i));bar(20+70*(i+1)/PARTS);await new Promise(r=>setTimeout(r,15));}
+    const p=await done;
+    if(!p.ok)throw new Error(p.err==='code'?'Kod doğrulanamadı. Tekrar dene.':'Çerçeve fotoğrafı kaydedemedi.');
+    bar(100);show('done');msg('');
+  }catch(e){msg(e.message,'err');}
+  finally{busy=false;$('progress').classList.add('hidden');update();}
+};
+function bar(p){$('progress').firstElementChild.style.width=p+'%';}
+$('again').onclick=()=>{item=null;$('editor').classList.add('hidden');$('pick').classList.remove('hidden');show('send');update();};
+</script></body></html>
