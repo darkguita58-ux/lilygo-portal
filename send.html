@@ -139,7 +139,7 @@ $('code').addEventListener('input',()=>{const d=digits().slice(0,8);$('code').va
 // ---- photo: panel shape, tone curve from the device, 16 grays with Floyd–Steinberg ----
 async function decode(file){
   try{return await createImageBitmap(file,{imageOrientation:'from-image'});}catch(e){}
-  return await new Promise((ok,bad)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=bad;i.src=URL.createObjectURL(file);});
+  return await new Promise((ok,bad)=>{const i=new Image(),url=URL.createObjectURL(file);i.onload=()=>{URL.revokeObjectURL(url);ok(i);};i.onerror=e=>{URL.revokeObjectURL(url);bad(e);};i.src=url;});
 }
 function render(src,o,fit,scale){
   const [W,H]=o==='land'?[960,540]:[540,960],w=Math.round(W*scale),h=Math.round(H*scale);
