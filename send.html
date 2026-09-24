@@ -165,7 +165,8 @@ async function preview(){
   document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('on',item[b.parentNode.dataset.k]===b.dataset.v));
 }
 $('file').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;
-  const src=await decode(file);item={file,orient:src.width<src.height?'port':'land',fit:'cover'};src.close&&src.close();
+  let src;try{src=await decode(file);}catch(err){msg(t('c_open_fail'),'err');return;}
+  item={file,orient:src.width<src.height?'port':'land',fit:'cover'};src.close&&src.close();
   $('pick').classList.add('hidden');$('editor').classList.remove('hidden');msg('');await preview();update();};
 document.querySelectorAll('.seg').forEach(s=>s.onclick=e=>{const v=e.target.dataset.v;if(!v||busy)return;item[s.dataset.k]=v;preview();});
 $('change').onclick=()=>{if(!busy)$('file').click();};
